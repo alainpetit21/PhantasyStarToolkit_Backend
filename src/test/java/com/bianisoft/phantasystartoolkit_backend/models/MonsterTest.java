@@ -1,15 +1,15 @@
 package com.bianisoft.phantasystartoolkit_backend.models;
 
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@Tag("Monster")
 @SpringBootTest
-public class MonsterTest {
+@DisplayName("The Monster object should ...")
+class MonsterTest {
     private Monster newMonster;
 
     @BeforeEach
@@ -17,23 +17,86 @@ public class MonsterTest {
         newMonster = new Monster();
     }
 
-    @Test
-    public void isCreatedDefaultCorrectly() {
-        assertNotNull(newMonster);
-        assertEquals(" ", newMonster.getName());
-        assertEquals(0x00, newMonster.getMaxNbInPartyNumber());
-        assertEquals(0x00, newMonster.getHP());
-        assertEquals(0x00, newMonster.getATK());
-        assertEquals(0x00, newMonster.getDEF());
-        assertEquals(0x00, newMonster.getIdItemDrop());
-        assertEquals(0x00, newMonster.getNbMesetas());
-        assertEquals(0x00, newMonster.getChanceTrap());
-        assertEquals(0x00, newMonster.getNbEXP());
-        assertEquals(0x00, newMonster.getChanceRun());
+
+    @Nested
+    @DisplayName("... be able to be created ... ")
+    class CreationTests {
+
+        @Test
+        @DisplayName(" ... as an empty monster with default values.")
+        void isCreatedDefaultCorrectly() {
+            assertNotNull(newMonster);
+            assertEquals(" ", newMonster.getName());
+            assertEquals(0x00, newMonster.getMaxNbInPartyNumber());
+            assertEquals(0x00, newMonster.getHP());
+            assertEquals(0x00, newMonster.getATK());
+            assertEquals(0x00, newMonster.getDEF());
+            assertEquals(0x00, newMonster.getIdItemDrop());
+            assertEquals(0x00, newMonster.getNbMesetas());
+            assertEquals(0x00, newMonster.getChanceTrap());
+            assertEquals(0x00, newMonster.getNbEXP());
+            assertEquals(0x00, newMonster.getChanceRun());
+        }
+
+        @Test
+        @DisplayName("... from a byte array.")
+        void isCreatedWithByteArray() {
+            byte [] arMonsterSworm = {
+                    0x53, 0x57, 0x4F, 0x52, 0x4D, 0x65, 0x20, 0x20,
+                    0x2A, 0x25, 0x05, 0x0A, 0x08, 0x04, 0x0C, 0x2F,
+                    0x0B, (byte)0xDA, (byte)0x9C, 0x12, 0x08, 0x08, 0x0D, 0x09,
+                    0x00, 0x03, 0x00, 0x0C, 0x02, 0x00, 0x38, (byte)0xFF
+            };
+
+            Monster newMonster2 = new Monster(arMonsterSworm);
+            assertEquals("SWORM", newMonster2.getName());
+            assertEquals(8, newMonster2.getHP());
+            assertEquals(8, newMonster2.getMaxNbInPartyNumber());
+            assertEquals(0x0D, newMonster2.getATK());
+            assertEquals(0x09, newMonster2.getDEF());
+            assertEquals(0, newMonster2.getIdItemDrop());
+            assertEquals(0x0003, newMonster2.getNbMesetas());
+            assertEquals(0x0002, newMonster2.getNbEXP());
+            assertEquals(0x0C, newMonster2.getChanceTrap());
+            assertEquals((byte)0xFF, newMonster2.getChanceRun());
+        }
+
+        @Test
+        @DisplayName("... from a copy constructor.")
+        void isCreatedWithCopyConstructor() {
+
+            //Taken directly from the SMS rom
+            byte [] arMonsterSworm = {
+                    0x53, 0x57, 0x4F, 0x52, 0x4D, 0x65, 0x20, 0x20,
+                    0x2A, 0x25, 0x05, 0x0A, 0x08, 0x04, 0x0C, 0x2F,
+                    0x0B, (byte)0xDA, (byte)0x9C, 0x12, 0x08, 0x08, 0x0D, 0x09,
+                    0x00, 0x03, 0x00, 0x0C, 0x02, 0x00, 0x38, (byte)0xFF
+            };
+
+            newMonster.unserialize(arMonsterSworm);
+
+            Monster newMonster2 = new Monster(newMonster);
+
+            assertNotSame(newMonster2, newMonster);
+
+            assertEquals("SWORM", newMonster2.getName());
+            assertEquals(8, newMonster2.getHP());
+            assertEquals(8, newMonster2.getMaxNbInPartyNumber());
+            assertEquals(0x0D, newMonster2.getATK());
+            assertEquals(0x09, newMonster2.getDEF());
+            assertEquals(0, newMonster2.getIdItemDrop());
+            assertEquals(0x0003, newMonster2.getNbMesetas());
+            assertEquals(0x0002, newMonster2.getNbEXP());
+            assertEquals(0x0C, newMonster2.getChanceTrap());
+            assertEquals((byte)0xFF, newMonster2.getChanceRun());
+        }
     }
 
+
+
     @Test
-    public void isAllStandardSetterWorks() {
+    @DisplayName("... be able to pass normal assignment of values.")
+    void isAllStandardSetterWorks() {
         newMonster.setName("A");
         assertEquals("A", newMonster.getName());
 
@@ -72,7 +135,8 @@ public class MonsterTest {
     }
 
     @Test
-    public void isEdgeCasesSetterWorks() {
+    @DisplayName("... be able to pass edge cases for limitation of the SMS Database format.")
+    void isEdgeCasesSetterWorks() {
         //Minimum of 1 characters (space by default)
         newMonster.setName("");
         assertEquals(" ", newMonster.getName());
@@ -148,7 +212,8 @@ public class MonsterTest {
 
 
     @Test
-    public void isSerializationToByteArrayWorks() {
+    @DisplayName("... be able to pass serialization to a byte Array.")
+    void isSerializationToByteArrayWorks() {
         byte [] arExampleSerialization = {
                 0x53, 0x57, 0x4F, 0x52, 0x4D, 0x65, 0x20, 0x20,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -175,7 +240,8 @@ public class MonsterTest {
     }
 
     @Test
-    public void isUnSerializationFromBytArrayWorks() {
+    @DisplayName("... be able to pass unserialization from a byte Array.")
+    void isUnSerializationFromBytArrayWorks() {
 
         //Taken directly from the SMS rom
         byte [] arMonsterSworm = {
@@ -187,16 +253,25 @@ public class MonsterTest {
 
         newMonster.unserialize(arMonsterSworm);
 
-        assertEquals("SWORM", newMonster.getName());
-        assertEquals(8, newMonster.getHP());
-        assertEquals(8, newMonster.getMaxNbInPartyNumber());
-        assertEquals(0x0D, newMonster.getATK());
-        assertEquals(0x09, newMonster.getDEF());
-        assertEquals(0, newMonster.getIdItemDrop());
-        assertEquals(0x0003, newMonster.getNbMesetas());
-        assertEquals(0x0002, newMonster.getNbEXP());
-        assertEquals(0x0C, newMonster.getChanceTrap());
-        assertEquals((byte)0xFF, newMonster.getChanceRun());
+        //Non-blocking assertAll, meaning one failure will not prevent execution of the reminder.
+        assertAll(
+                () -> assertEquals("SWORM", newMonster.getName()),
+                () -> assertEquals(8, newMonster.getHP()),
+                () -> assertEquals(8, newMonster.getMaxNbInPartyNumber()),
+                () -> assertEquals(0x0D, newMonster.getATK()),
+                () -> assertEquals(0x09, newMonster.getDEF()),
+                () -> assertEquals(0, newMonster.getIdItemDrop()),
+                () -> assertEquals(0x0003, newMonster.getNbMesetas()),
+                () -> assertEquals(0x0002, newMonster.getNbEXP()),
+                () -> assertEquals(0x0C, newMonster.getChanceTrap()),
+                () -> assertEquals((byte)0xFF, newMonster.getChanceRun())
+        );
+    }
 
+    @Test
+    @Disabled
+    @DisplayName("... have one disabled test case.")
+    void disabledTestCase() {
+        fail("Should not happens");
     }
 }

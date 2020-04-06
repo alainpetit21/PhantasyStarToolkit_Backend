@@ -44,6 +44,13 @@ public class Monster {
         unserialize(pData);
     }
 
+    public Monster(Monster objCopy){
+        byte [] serializationCopy = new byte[32];
+        objCopy.serialize(serializationCopy);
+
+        this.unserialize(serializationCopy);
+    }
+
     public void unserialize(byte[] pData){
         strName = new String(Arrays.copyOfRange(pData, 0, 8));
         unknown_8to15 = Arrays.copyOfRange(pData, 8, 16);
@@ -71,9 +78,6 @@ public class Monster {
     public void serialize(byte[] pData){
         if(strName.length() < 8)
             strName= strName + 'e';
-        else if (strName.length() > 8)
-            strName= strName.substring(0, 8);
-
 
         for(int i= 0; i < 8; ++i){
             if(i < strName.length())
@@ -84,7 +88,6 @@ public class Monster {
 
         for(int i= 8, j=0; i < 16; ++i, ++j)
             pData[i]= unknown_8to15[j];
-
 
         pData[16]= nBankOffset;
         pData[17]= (byte)(nGraphicOffset&0xFF);
