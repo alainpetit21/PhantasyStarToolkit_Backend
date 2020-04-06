@@ -41,10 +41,10 @@ public class Monster {
     }
 
     public Monster(byte[] pData){
-        UnSerialize(pData);
+        unserialize(pData);
     }
 
-    public void UnSerialize(byte[] pData){
+    public void unserialize(byte[] pData){
         strName = new String(Arrays.copyOfRange(pData, 0, 8));
         unknown_8to15 = Arrays.copyOfRange(pData, 8, 16);
         nBankOffset = pData[16];
@@ -60,9 +60,15 @@ public class Monster {
         nEXP = ((pData[28]&0xFF)) | ((pData[29]&0xFF) << 8);
         unknown_30 = pData[30];
         nRun = pData[31];
+
+        //abstract out the SMS format of 'e' end of string delimitation and extra padding withespace.
+        int idxDeliminator = strName.indexOf("e");
+        if(idxDeliminator != -1){
+            strName= strName.substring(0, idxDeliminator);
+        }
     }
 
-    public void Serialize(byte[] pData){
+    public void serialize(byte[] pData){
         if(strName.length() < 8)
             strName= strName + 'e';
         else if (strName.length() > 8)
