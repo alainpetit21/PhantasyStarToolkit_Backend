@@ -20,44 +20,49 @@ import java.util.Arrays;
 
 
 public class Monster {
-    private String strName;
-    private byte[] unknown_8to15;
-    private byte nBankOffset;
-    private int nGraphicOffset;
-    private byte unknown_19;
-    private byte nPartyNumber;
-    private byte nHP;
-    private byte nATK;
-    private byte nDEF;
-    private byte ItemDrop;
-    private int nMesetas;
-    private byte nChanceTrap;
-    private int nEXP;
-    private byte unknown_30;
-    private byte nRun;
+    private String strName = " ";
+    private byte[] unknown_8to15= {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    private byte nBankOffset = 0x00;
+    private int nGraphicOffset = 0x0000;
+    private byte unknown_19 = 0x00;
+    private byte nPartyNumber = 0x00;
+    private byte nHP = 0x00;
+    private byte nATK = 0x00;
+    private byte nDEF = 0x00;
+    private byte nIdItemDrop = 0x00;
+    private int nMesetas = 0x0000;
+    private byte nChanceTrap = 0x00;
+    private int nEXP = 0x0000;
+    private byte unknown_30 = 0x00;
+    private byte nRun =0x00;
 
 
-    private Monster(){ }
+    public Monster(){
+    }
+
     public Monster(byte[] pData){
+        UnSerialize(pData);
+    }
+
+    public void UnSerialize(byte[] pData){
         strName = new String(Arrays.copyOfRange(pData, 0, 8));
         unknown_8to15 = Arrays.copyOfRange(pData, 8, 16);
         nBankOffset = pData[16];
-        nGraphicOffset = ((int)(pData[17]&0xFF)) | ((int)(pData[18]&0xFF) << 8);
+        nGraphicOffset = ((pData[17]&0xFF)) | ((pData[18]&0xFF) << 8);
         unknown_19= pData[19];
         nPartyNumber = pData[20];
         nHP = pData[21];
         nATK = pData[22];
         nDEF = pData[23];
-        ItemDrop = pData[24];
-        nMesetas = ((int)(pData[25]&0xFF)) | ((int)(pData[26]&0xFF) << 8);
+        nIdItemDrop = pData[24];
+        nMesetas = ((pData[25]&0xFF)) | ((pData[26]&0xFF) << 8);
         nChanceTrap = pData[27];
-        nEXP = ((int)(pData[28]&0xFF)) | ((int)(pData[29]&0xFF) << 8);
+        nEXP = ((pData[28]&0xFF)) | ((pData[29]&0xFF) << 8);
         unknown_30 = pData[30];
         nRun = pData[31];
     }
 
-
-    public void SaveToBuffer(byte[] pData){
+    public void Serialize(byte[] pData){
         if(strName.length() < 8)
             strName= strName + 'e';
         else if (strName.length() > 8)
@@ -83,7 +88,7 @@ public class Monster {
         pData[21]= nHP;
         pData[22]= nATK;
         pData[23]= nDEF;
-        pData[24]= ItemDrop;
+        pData[24]= nIdItemDrop;
         pData[25]= (byte)(nMesetas&0xFF);
         pData[26]= (byte)((nMesetas&0xFF)>>8);
         pData[27]= nChanceTrap;
@@ -93,83 +98,112 @@ public class Monster {
         pData[31]= nRun;
     }
 
-    public String getStrName() {
+    private byte cropByte(int input){
+        //crop to 0 if lower;
+        if(input < 0)
+            return (byte) 0x00;
+
+            //crop to 0xFF if higher;
+        else if(input > 0xFF)
+            return (byte) 0xFF;
+
+        return (byte)input;
+    }
+
+    private int cropShort(int input){
+        //crop to 0 if lower;
+        if(input < 0)
+            return 0x0000;
+
+            //crop to 0xFF if higher;
+        else if(input > 0xFFFF)
+            return  0xFFFF;
+
+        return input;
+    }
+
+    public String getName() {
         return strName;
     }
 
-    public void setStrName(String strName) {
+    public void setName(String strName) {
+        if (strName.length() > 8)
+            strName= strName.substring(0, 8);
+        else  if (strName.length() == 0)
+            strName= " ";
+
         this.strName = strName;
     }
 
-    public byte getnPartyNumber() {
+    public byte getMaxNbInPartyNumber() {
         return nPartyNumber;
     }
 
-    public void setnPartyNumber(byte nPartyNumber) {
-        this.nPartyNumber = nPartyNumber;
+    public void setMaxNbInPartyNumber(int nPartyNumber) {
+        this.nPartyNumber = (byte) nPartyNumber;
     }
 
-    public byte getnHP() {
+    public byte getHP() {
         return nHP;
     }
 
-    public void setnHP(byte nHP) {
-        this.nHP = nHP;
+    public void setHP(int nHP) {
+        this.nHP = cropByte(nHP);
     }
 
-    public byte getnATK() {
+    public byte getATK() {
         return nATK;
     }
 
-    public void setnATK(byte nATK) {
-        this.nATK = nATK;
+    public void setATK(int nATK) {
+        this.nATK = cropByte(nATK);
     }
 
-    public byte getnDEF() {
+    public byte getDEF() {
         return nDEF;
     }
 
-    public void setnDEF(byte nDEF) {
-        this.nDEF = nDEF;
+    public void setDEF(int nDEF) {
+        this.nDEF = cropByte(nDEF);
     }
 
-    public byte getItemDrop() {
-        return ItemDrop;
+    public byte getIdItemDrop() {
+        return nIdItemDrop;
     }
 
-    public void setItemDrop(byte itemDrop) {
-        ItemDrop = itemDrop;
+    public void setIdItemDrop(int nIdItemDrop) {
+        this.nIdItemDrop = cropByte(nIdItemDrop);
     }
 
-    public int getnMesetas() {
+    public int getNbMesetas() {
         return nMesetas;
     }
 
-    public void setnMesetas(int nMesetas) {
-        this.nMesetas = nMesetas;
+    public void setNbMesetas(int nMesetas) {
+        this.nMesetas = cropShort(nMesetas);
     }
 
-    public byte getnChanceTrap() {
+    public byte getChanceTrap() {
         return nChanceTrap;
     }
 
-    public void setnChanceTrap(byte nChanceTrap) {
-        this.nChanceTrap = nChanceTrap;
+    public void setChanceTrap(int nChanceTrap) {
+        this.nChanceTrap = cropByte(nChanceTrap);
     }
 
-    public int getnEXP() {
+    public int getNbEXP() {
         return nEXP;
     }
 
-    public void setnEXP(int nEXP) {
-        this.nEXP = nEXP;
+    public void setNbEXP(int nEXP) {
+        this.nEXP = cropShort(nEXP);
     }
 
-    public byte getnRun() {
+    public byte getChanceRun() {
         return nRun;
     }
 
-    public void setnRun(byte nRun) {
-        this.nRun = nRun;
+    public void setChanceRun(int nRun) {
+        this.nRun = cropByte(nRun);
     }
 }
