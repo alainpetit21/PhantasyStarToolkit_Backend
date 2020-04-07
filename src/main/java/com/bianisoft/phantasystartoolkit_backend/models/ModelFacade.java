@@ -5,10 +5,11 @@ import java.util.ArrayList;
 
 
 public class ModelFacade {
-    private PSRomFile mobjFile = null;
-    private ArrayList<Monster> marMonster = null;
-    private ArrayList<IObserverMonsterLoaded> marObserverMonsterList= null;
-    private ArrayList<IObserverPSRomFileOpened> marObserverPSRomFile= null;
+    private PSRomData mobjFile;
+    private ArrayList<Monster> marMonster;
+    private ArrayList<IObserverMonsterLoaded> marObserverMonsterList;
+    private ArrayList<IObserverPSRomFileOpened> marObserverPSRomFile;
+
 
     ///Singleton Design Pattern
     private static class SingletonClassHolder {
@@ -20,7 +21,7 @@ public class ModelFacade {
     }
 
     private ModelFacade() {
-        mobjFile= new PSRomFile();
+        mobjFile= new PSRomData();
         marMonster= new ArrayList<>();
         marObserverMonsterList= new ArrayList<>();
         marObserverPSRomFile= new ArrayList<>();
@@ -43,15 +44,14 @@ public class ModelFacade {
             objObserverMonsterList.notify(marMonster);
     }
 
-    //Setter / Getter
-    public void setPSRomFile(String p_strObj){
-        mobjFile.Open(p_strObj);
+    public void setPSRomFileData(byte[] pdata){
+        mobjFile.setData(pdata);
 
-        for(IObserverPSRomFileOpened objObserverSMSFile : marObserverPSRomFile)
-            objObserverSMSFile.notify(mobjFile);
+        for(IObserverMonsterLoaded objObserverMonsterList : marObserverMonsterList)
+            marObserverPSRomFile.notify();
     }
 
-    public PSRomFile getSMSFile(){
+    public PSRomData getSMSFile(){
         return mobjFile;
     }
 }
